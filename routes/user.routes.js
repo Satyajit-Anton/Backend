@@ -2,6 +2,7 @@ import { Router } from "express";
 import { assignAccessToken, getCurrentUser, getWatchHistory, loginUser, logoutUser, registerUser, subsciprtionDetails, updateAccountDetails, updateAvatarImage, updateCoverImage, updatePassword } from "../controllers/user.registercontrollers.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/jwt.middleware.js";
+import { allVideosDetails, deleteVideo, videoUploader } from "../controllers/video.controller.js";
 
 const router=Router()
 
@@ -69,6 +70,32 @@ const router=Router()
     getWatchHistory
   )
 
+  router.route("/user/videoupload").post(
+    verifyJWT,
+    upload.fields(
+      [
+        {
+          name:"videoFile",
+          maxCount:1
+        },
+        {
+          name:"thumbnail",
+          maxCount:1
+        }
+      ]
+    ),
+    videoUploader
+  )
+
+  router.route("/user/getvideo").get(
+    verifyJWT,
+    allVideosDetails
+  )
+  
+  router.route("/removevideo").delete(
+    verifyJWT,
+    deleteVideo
+  )
  
 
 export default router;
