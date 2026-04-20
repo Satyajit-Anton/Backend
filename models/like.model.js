@@ -8,11 +8,13 @@ const likeSchema=new Schema({
     },
     targetType:{
         type:String,
-        required:true
+        required:true,
+        enum: ["Video", "Tweet", "Comment"]
     },
     likedBy:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
+        ref:"User",
+        required:true
     }
 },
 {timestamps:true})

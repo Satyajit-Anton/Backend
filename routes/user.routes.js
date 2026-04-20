@@ -3,6 +3,7 @@ import { assignAccessToken, getCurrentUser, getWatchHistory, loginUser, logoutUs
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/jwt.middleware.js";
 import { allVideosDetails, deleteVideo, editVideo, videoUploader } from "../controllers/video.controller.js";
+import { doLike, unLike } from "../controllers/like.controller.js";
 
 const router=Router()
 
@@ -100,6 +101,16 @@ const router=Router()
   router.route("/update/:id").get(
     upload.single("thumbnail"),
     editVideo
+  )
+
+  router.route("/like").post(
+    verifyJWT,
+    doLike
+  )
+
+  router.route("/unlike").delete(
+    verifyJWT,
+    unLike
   )
  
 
