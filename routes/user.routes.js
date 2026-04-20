@@ -80,7 +80,7 @@ const router=Router()
         },
         {
           name:"thumbnail",
-          maxCount:1
+          maxCount:0
         }
       ]
     ),
