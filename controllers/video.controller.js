@@ -162,7 +162,49 @@ export const deleteVideo=asyncHandler(async function(req,res) {
     return res
     .status(200)
     .json(
-        "200",
-        "Video Deleted SuccessFully"
+        new ApiResponse(
+            "200",
+            "Video Deleted SuccessFully"
+        )
     )
+})
+
+//Edit Video
+export const editVideo=asyncHandler(async function (req,res) {
+    const {id}=req.params
+
+    const {titile,description}=req.body
+    const thumbnailLocalPath=req.file?.path
+
+    if (!titile || !description || !thumbnailLocalPath) {
+        throw new ApiError(400,"Must need to Change something")
+    }
+
+    if(!id){
+        throw new ApiError(400,"User must select a video Update")
+    }
+
+    let filePath;
+    if (thumbnailLocalPath) {
+        filePath=await uploadOnCloudiNary(thumbnailLocalPath)
+    }
+
+    const Response=Video.findById(
+        id
+    )
+
+    if(!Response){
+        throw new ApiError(400,"video is Not there or deleted")
+    }
+
+    if (filePath) {
+        Response.titile=
+    }else{
+        await Video.findByIdAndUpdate(
+            id,
+            titile,
+            description,
+
+        )
+    }
 })
