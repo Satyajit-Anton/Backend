@@ -173,10 +173,10 @@ export const deleteVideo=asyncHandler(async function(req,res) {
 export const editVideo=asyncHandler(async function (req,res) {
     const {id}=req.params
 
-    const {titile,description}=req.body
+    const {titile,description,isPublished}=req.body
     const thumbnailLocalPath=req.file?.path
 
-    if (!titile || !description || !thumbnailLocalPath) {
+    if (!titile && !description && !thumbnailLocalPath && isPublished===undefined) {
         throw new ApiError(400,"Must need to Change something")
     }
 
@@ -189,22 +189,38 @@ export const editVideo=asyncHandler(async function (req,res) {
         filePath=await uploadOnCloudiNary(thumbnailLocalPath)
     }
 
-    const Response=Video.findById(
+    const video=await Video.findById(
         id
     )
 
-    if(!Response){
-        throw new ApiError(400,"video is Not there or deleted")
+    if(!video){
+        throw new ApiError(400,"Video Not Found to edit or Some issue happnened")
     }
 
-    if (filePath) {
-        Response.titile=
-    }else{
-        await Video.findByIdAndUpdate(
-            id,
-            titile,
-            description,
+    const oldThumbNail=video.thumbnail
 
+    try {
+        if(titile) video.titile=titile
+        if(description) video.description=description
+        if(filePath) video.thumbnail=filePath.url
+        if(isPublished !==undefined) video.isPublished=isPublished
+        await video.save()
+
+        if(filePath && oldThumbNail){
+        await cloudinary.uploader.destroy(getUrlID(oldThumbNail), {
+           resource_type: "image"
+        });
+    }
+    } catch (error) {
+        throw new ApiError(400,error)
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            "200",
+            "Edit Successfully Done"
         )
-    }
+    )
 })
