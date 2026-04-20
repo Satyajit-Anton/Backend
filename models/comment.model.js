@@ -7,11 +7,18 @@ const commentSchema=new Schema({
     },
     commentBy:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
+        ref:"User",
+        required:true
     },
-    video:{
+    targetId:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"Video"
+        refPath:"targetType",
+        required:true
+    },
+    targetType:{
+        type:String,
+        required:true,
+        enum:["Video","Tweet"]
     }
 },{timestamps:true})
 
