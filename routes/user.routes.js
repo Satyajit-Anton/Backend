@@ -97,7 +97,8 @@ const router=Router()
     deleteVideo
   )
 
-  router.route("/update:username").get(
+  router.route("/update/:id").get(
+    upload.single("thumbnail"),
     editVideo
   )
  

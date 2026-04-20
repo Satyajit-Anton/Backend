@@ -169,7 +169,7 @@ export const deleteVideo=asyncHandler(async function(req,res) {
     )
 })
 
-//Edit Video
+//Edit VideoData But not Video
 export const editVideo=asyncHandler(async function (req,res) {
     const {id}=req.params
 
@@ -224,3 +224,4 @@ export const editVideo=asyncHandler(async function (req,res) {
         )
     )
 })
+
