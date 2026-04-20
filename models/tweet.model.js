@@ -6,7 +6,7 @@ const tweetSchema=new Schema({
         required:true
     },
     tweetBy:{
-        type:mongoose.Schema.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"user"
     },
 

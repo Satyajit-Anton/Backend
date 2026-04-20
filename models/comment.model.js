@@ -1,4 +1,4 @@
-import mongoose,{mongo, MongooseError, Schema} from "mongoose";
+import mongoose,{Schema} from "mongoose";
 
 const commentSchema=new Schema({
     comment:{
@@ -6,11 +6,11 @@ const commentSchema=new Schema({
         required:true
     },
     commentBy:{
-        type:mongoose.Schema.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
     video:{
-        type:mongoose.Schema.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"Video"
     }
 },{timestamps:true})

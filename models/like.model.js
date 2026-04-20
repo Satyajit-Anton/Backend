@@ -1,20 +1,17 @@
 import mongoose,{Schema} from "mongoose";
 
 const likeSchema=new Schema({
-    video:{
-        type:mongoose.Schema.ObjectId,
-        ref:"Video"
+    targetId:{
+        type:mongoose.Schema.Types.ObjectId,
+        required: true,
+        refPath: "targetType"
     },
-    tweet:{
-        type:mongoose.Schema.ObjectId,
-        ref:"Tweet"
-    },
-    comment:{
-        type:mongoose.Schema.ObjectId,
-        ref:"Comment"
+    targetType:{
+        type:String,
+        required:true
     },
     likedBy:{
-        type:mongoose.Schema.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }
 },

@@ -6,11 +6,11 @@ const playListSchema=new Schema({
         required:true
     },
     owner:{
-        type:mongoose.Schema.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
     videos:{
-        type:mongoose.Schema.ObjectId,
+        type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     }
 },{timestamps:true})
