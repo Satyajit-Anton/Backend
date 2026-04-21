@@ -5,11 +5,7 @@ const commentSchema=new Schema({
         type:String,
         required:true
     },
-    commentBy:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"User",
-        required:true
-    },
+    
     targetId:{
         type:mongoose.Schema.Types.ObjectId,
         refPath:"targetType",

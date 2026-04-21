@@ -95,6 +95,74 @@ const updateComment=asyncHandler(async function(req,res) {
 //Delete Comment
 const deleteComment=asyncHandler(async function (req,res) {
     const userId=req.user?._id
-
     const{commentId}=req.body
+
+   if (!userId) {
+      throw new ApiError(401, "User not authenticated");
+    }
+
+   if (!commentId) {
+       throw new ApiError(400, "Comment ID is required");
+    }
+
+    const response=await Comment.findOneAndDelete(
+        {
+            _id:commentId,
+            owner:userId
+        }
+    )
+
+    if(!response){
+        throw new ApiError(400,"Not authorized or comment not found")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "Comment Deleted Successfully"
+        )
+    )
+    
+})
+
+const findoutComment=asyncHandler(async function(req,res,targetType) {
+    const {id}=req.params
+
+    if(!new mongoose.Types.ObjectId.isValid(id)){
+        throw new ApiError(400,"Id is not matching to fetch Any comment")
+    }
+
+    const comments=await Comment.find(
+        {
+            targetId:id,
+            targetType
+        }
+    )
+
+    if(!comments){
+        throw new ApiError(400,"Comemnt not Found")
+    }
+
+    return res.
+    status(200)
+    .json(
+        new ApiResponse(
+            200,
+            comments,
+            "Fetched Succesfully"
+        )
+    )
+
+})
+
+//Find Comment For Video
+export const findCommentForVideo=asyncHandler(async function (req,res) {
+    return findoutComment(req,res,"Video")
+})
+
+//Find Comment For Tweet
+export const findCommentForTweet=asyncHandler(async function (req,res) {
+    return findoutComment(req,res,"Tweet")
 })
