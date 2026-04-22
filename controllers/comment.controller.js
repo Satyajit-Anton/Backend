@@ -127,42 +127,66 @@ const deleteComment=asyncHandler(async function (req,res) {
     
 })
 
+//Function for Fetch Comment on Pagination of limit 10
 const findoutComment=asyncHandler(async function(req,res,targetType) {
-    const {id}=req.params
+    const {targetId}=req.params
+    const {cursor}=req.query
+    const {userId}=req.user
+    //After ? we can send any query
+    let Limit=10
 
-    if(!new mongoose.Types.ObjectId.isValid(id)){
+    if(!mongoose.Types.ObjectId.isValid(targetId)){
         throw new ApiError(400,"Id is not matching to fetch Any comment")
     }
 
-    const comments=await Comment.find(
-        {
-            targetId:id,
-            targetType
-        }
-    )
+    let query={
+        targetId,
+        targetType
+    }
+
+    if(cursor){
+        query._id={$lt:new mongoose.Types.ObjectId(cursor)}
+        //less than id because new id > old id
+    }
+
+    const comments=await Comment.find(query)
+    .sort({_id: -1 })
+    //will sort greater first small last soo newest comment first oldest last
+    .limit(Limit)
 
     if(!comments){
         throw new ApiError(400,"Comemnt not Found")
     }
+
+    let commentEditable=comments.map((comment)=>{
+       let obj=comment.toObject()
+       obj.isEditable= userId && userId.toString()===obj.owner.toString()
+       return obj
+    })
+
+    const nextCursor=comments.length>0?comments[comments.length-1]._id:null
 
     return res.
     status(200)
     .json(
         new ApiResponse(
             200,
-            comments,
+            {
+                comments:commentEditable,
+                nextCursor
+            },
             "Fetched Succesfully"
         )
     )
 
 })
 
-//Find Comment For Video
+//Find Comment For Video with the help of upper fucntion
 export const findCommentForVideo=asyncHandler(async function (req,res) {
     return findoutComment(req,res,"Video")
 })
 
-//Find Comment For Tweet
+//Find Comment For Tweet with the help of upper fucntion
 export const findCommentForTweet=asyncHandler(async function (req,res) {
     return findoutComment(req,res,"Tweet")
 })

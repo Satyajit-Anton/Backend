@@ -93,3 +93,9 @@ export const unLike=asyncHandler(async function(req,res) {
 
 })
 
+//Find All Like on Any Video or Tweet
+
+export const findLike=asyncHandler(async function(req,res) {
+    
+})
+
