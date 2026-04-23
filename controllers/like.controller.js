@@ -94,8 +94,81 @@ export const unLike=asyncHandler(async function(req,res) {
 })
 
 //Find All Like on Any Video or Tweet
+const findLike=asyncHandler(async function(req,res,targetType) {
+    const {id: targetId}=req.params
+    const userId=req.user?._id
 
-export const findLike=asyncHandler(async function(req,res) {
+
+    let Liked;
+    if(userId){
+        Liked=await Like.aggregate([
+            {
+              $match:{
+                targetId,
+                targetType,
+              }   
+            },
+            {
+                $group:{
+                    _id:null,
+                    //means all match document comes to this group
+                    totalLikes:{$sum:1},
+                    likedByuser:{
+                        $sum:{
+                            $cond:[
+                             {$eq:["$likedBy", new mongoose.Types.ObjectId(userId)]},
+                              1,
+                              0
+                            ]
+                        }
+                    }
+
+                }
+            }
+        ])
+    }else{
+        Liked=await Like.aggregate([
+            {
+              $match:{
+                targetId,
+                targetType,
+              }   
+            },
+            {
+               $count: "totalLikes"
+            }
+        ])
+
+    }
     
+    const totalLikes=Liked[0]?.totalLikes || 0
+    const likedByUser=Liked[0]?.likedByuser || 0
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            {
+               totalLikes,
+               likedByUser
+            },
+            "fteched successfully"
+
+        )
+    )
+
+
 })
 
+export const getLikeForVideo=asyncHandler(async function(req,res) {
+    return findLike(req,res,"Video")
+})
+
+export const getLikeForTweet=asyncHandler(async function(req,res) {
+    return findLike(req,res,"Tweet")
+})
+
+export const getLikeForComment=asyncHandler(async function(req,res) {
+    return findLike(req,res,"Comment")
+})
