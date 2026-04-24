@@ -75,6 +75,42 @@ export const editTweet=asyncHandler(async function(req,res) {
 
 })
 
+export const deleteTweet=asyncHandler(async function(req,res) {
+    const userId=req.user?._id
+    const {tweetId}=req.params
+
+    if(!userId){
+        throw new ApiError(400,"User is not Authenticated to Do that")
+    }
+
+    if(!tweetId){
+        throw new ApiError(400,"CommentId Must need to Delete tweet")
+    }
+
+    const Deleted=await Tweet.findOneAndDelete(
+        {
+            _id:tweetId,
+            tweetBy:userId
+        }
+    )
+
+    if(!Deleted){
+        throw new ApiError(400,"User is not Authenticate to Do the Delete or Comment Not Found")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            null,
+            "Comment deleted Successfully"
+        )
+    )
+
+
+})
+
 export const fetchAllTweets=asyncHandler(async function(req,res) {
     const userId=req.user?._id
     const {cursor}=req.query
@@ -116,38 +152,3 @@ export const fetchAllTweets=asyncHandler(async function(req,res) {
 
 })
 
-export const deleteTweet=asyncHandler(async function(req,res) {
-    const userId=req.user?._id
-    const {tweetId}=req.params
-
-    if(!userId){
-        throw new ApiError(400,"User is not Authenticated to Do that")
-    }
-
-    if(!tweetId){
-        throw new ApiError(400,"CommentId Must need to Delete tweet")
-    }
-
-    const Deleted=await Tweet.findOneAndDelete(
-        {
-            _id:tweetId,
-            tweetBy:userId
-        }
-    )
-
-    if(!Deleted){
-        throw new ApiError(400,"User is not Authenticate to Do the Delete or Comment Not Found")
-    }
-
-    return res
-    .status(200)
-    .json(
-        new ApiResponse(
-            200,
-            null,
-            "Comment deleted Successfully"
-        )
-    )
-
-
-})
