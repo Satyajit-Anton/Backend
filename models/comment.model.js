@@ -5,7 +5,6 @@ const commentSchema=new Schema({
         type:String,
         required:true
     },
-    
     targetId:{
         type:mongoose.Schema.Types.ObjectId,
         refPath:"targetType",
@@ -15,6 +14,11 @@ const commentSchema=new Schema({
         type:String,
         required:true,
         enum:["Video","Tweet"]
+    },
+    owner:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:"User",
+        required:true
     }
 },{timestamps:true})
 
