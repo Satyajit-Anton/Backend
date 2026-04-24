@@ -131,8 +131,9 @@ const deleteComment=asyncHandler(async function (req,res) {
 const findoutComment=asyncHandler(async function(req,res,targetType) {
     const {targetId}=req.params
     const {cursor}=req.query
+    //send the last comment createdAt time soo from the basis of last comment date
     const {userId}=req.user
-    //After ? we can send any query
+    //After "?" we can send any query
     let Limit=10
 
     if(!mongoose.Types.ObjectId.isValid(targetId)){
