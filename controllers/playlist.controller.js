@@ -2,6 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import {PlayList} from "../models/playlist.model.js"
+import mongoose from "mongoose";
 
 export const createPlayList=asyncHandler(async function(req,res) {
     const userId=req.user?._id
@@ -45,6 +46,112 @@ export const createPlayList=asyncHandler(async function(req,res) {
             201,
             playList,
             "Playlist Created Successfully"
+        )
+    )
+})
+
+export const findPlayList=asyncHandler(async function (req,res) {
+    const userId=req.user?._id
+
+    if(!userId){
+        throw new ApiError(400,"User is not Authorized to Give request")
+    }
+
+    const result=await PlayList.aggregate([
+        {
+            $match:{
+                owner:new mongoose.Types.ObjectId(userId)
+            }
+        }
+    ])
+
+    if(result.length === 0){
+        throw new ApiError(400,"No Playlist Found or User is not found or unauthorized access")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            result,
+            "PLaylist fteched Sucessfully"
+        )
+    )
+})
+
+export const removeItemFromPlaylist=asyncHandler(async function(req,res) {
+    const userId=req.user?._id
+    const { playlistId, videoId } = req.query;
+
+    if(!userId){
+        throw new ApiError(400,"User is not authenticated")
+    }
+
+    if(!playlistId || !videoId){
+        throw new ApiError(400,"Playlist Is not given")
+    }
+
+    const result=await PlayList.findOneAndUpdate(
+       {
+        _id:playlistId,
+        owner:userId,
+        videos:videoId
+       },
+       {
+        $pull:{videos:videoId}
+       },
+       {
+        new:true
+       }
+    )
+
+    if(!result){
+        throw new ApiError(400,"Video is not removed from playlist or not found")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            result,
+            "Playlist Updated Successfully"
+        )
+    )
+
+
+})
+
+export const removePlaylist=asyncHandler(async function(req,res) {
+    const userId=req.user?._id
+    const {playlistId}=req.params
+
+    if(!userId){
+        throw new ApiError(400,"user is not authenticated")
+    }
+
+    if(!playlistId){
+        throw new ApiError(400,"Playlist Id not avail for Delete")
+    }
+
+    const result=await PlayList.findOneAndDelete(
+        {
+            _id:playlistId,
+            owner:userId
+        }
+    )
+
+    if(!result){
+        throw new ApiError(500,"Deletion Failed Due to unexpected issue")
+    }
+
+    return res.
+    status(200)
+    .json(
+        new ApiResponse(
+            200,
+            "PlayList Delete Successfully"
         )
     )
 })
