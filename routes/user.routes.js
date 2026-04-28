@@ -3,10 +3,11 @@ import { assignAccessToken, getCurrentUser, getWatchHistory, loginUser, logoutUs
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/jwt.middleware.js";
 import { allVideosDetails, deleteVideo, editVideo, videoUploader } from "../controllers/video.controller.js";
-import { doLike, unLike } from "../controllers/like.controller.js";
+import { doLike, getLikeForComment, getLikeForTweet, getLikeForVideo, unLike } from "../controllers/like.controller.js";
+import {optionalVerfiyJwt} from "../middlewares/optional.middleware.js"
 
 const router=Router()
-
+//Hello
   router.route("/register").post(
     //injected middleware because files are two or more soo fields
     //it need array with all details of object
@@ -102,16 +103,35 @@ const router=Router()
     upload.single("thumbnail"),
     editVideo
   )
-
-  router.route("/like").post(
+ 
+  //Like Route
+  router.route("/user/like").post(
     verifyJWT,
     doLike
   )
 
-  router.route("/unlike").delete(
+  router.route("/user/unlike").delete(
     verifyJWT,
     unLike
   )
+
+  router.route("/user/video/:id/get-alllikes").get(
+    optionalVerfiyJwt,
+    getLikeForVideo
+  )
+
+  router.route("/user/tweet/:id/get-alllikes").get(
+    optionalVerfiyJwt,
+    getLikeForTweet
+  )
+
+  router.route("/user/comment/:id/get-alllikes").get(
+    optionalVerfiyJwt,
+    getLikeForComment
+  )
+
+
+  //
  
 
 export default router;
