@@ -141,10 +141,11 @@ const findoutComment=asyncHandler(async function(req,res,targetType) {
     const {targetId}=req.params
     const {cursor}=req.query
     //send the last comment createdAt time soo from the basis of last comment date
-    const {userId}=req.user
-    //After "?" we can send any query
+    const userId=req.user?._id
+    
     let Limit=10
-
+    //After "?" we can send any query
+    
     if(!mongoose.Types.ObjectId.isValid(targetId)){
         throw new ApiError(400,"Id is not matching to fetch Any comment")
     }
@@ -192,11 +193,11 @@ const findoutComment=asyncHandler(async function(req,res,targetType) {
 })
 
 //Find Comment For Video with the help of upper fucntion
-export const findCommentForVideo=asyncHandler(async function (req,res) {
-    return findoutComment(req,res,"Video")
+export const findCommentForVideo=asyncHandler(async function (req,res,targetType) {
+    await findoutComment(req,res,"Video")
 })
 
 //Find Comment For Tweet with the help of upper fucntion
-export const findCommentForTweet=asyncHandler(async function (req,res) {
-    return findoutComment(req,res,"Tweet")
+export const findCommentForTweet=asyncHandler(async function (req,res,targetType) {
+    await findoutComment(req,res,"Tweet")
 })
