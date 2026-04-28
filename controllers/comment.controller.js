@@ -5,26 +5,27 @@ import { Comment } from "../models/comment.model.js";
 import mongoose from "mongoose";
 
 //DO Comment On Video And Tweet
-const doComment=asyncHandler(async function(req,res) {
+export const doComment=asyncHandler(async function(req,res) {
     const userId=req.user?._id
     if (!userId) {
         throw new ApiError(401,"User is not authenticated")
     }
 
     const {comment,targetId,targetType}=req.body
+    
 
     if(!comment || !targetId || !targetType){
         throw new ApiError(400,"user must need to Provide ALL Stuff to get comment")
     }
 
     if(!mongoose.Types.ObjectId.isValid(targetId)){
-        throw new ApiError(400,"Please pass a Valida targetId")
+        throw new ApiError(400,"Please pass a Valid targetId")
     }
 
     const response=await Comment.create(
         {
             comment,
-            commentBy:userId,
+            owner:userId,
             targetId,
             targetType
         }
@@ -47,12 +48,13 @@ const doComment=asyncHandler(async function(req,res) {
 })
 
 //Update Comment
-const updateComment=asyncHandler(async function(req,res) {
+export const updateComment=asyncHandler(async function(req,res) {
     const userId = req.user?._id;
     if(!userId){
         throw new ApiError(401,"User is not authenticated")
     }
     const {id,comment}=req.body
+    
 
     if(!id || !comment){
         throw new ApiError(400,"User is not Authenticated to Do that")
@@ -64,8 +66,15 @@ const updateComment=asyncHandler(async function(req,res) {
         throw new ApiError(400,"Comment not Found to Edit")
     }
 
-    if(existingComment.commentBy.toString()!==userId.toString()){
+    console.log(existingComment);
+    
+
+    if(existingComment.owner.toString()!==userId.toString()){
         throw new ApiError(400,"You are not authenticated to do the Update")
+    }
+
+    if(existingComment.comment.trim()==comment){
+        throw new ApiError(400,"If you wants to update the comment please update with new thoght now with same Comment")
     }
 
 
@@ -93,7 +102,7 @@ const updateComment=asyncHandler(async function(req,res) {
 })
 
 //Delete Comment
-const deleteComment=asyncHandler(async function (req,res) {
+export const deleteComment=asyncHandler(async function (req,res) {
     const userId=req.user?._id
     const{commentId}=req.body
 
