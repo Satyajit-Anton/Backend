@@ -2,7 +2,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Like } from "../models/like.model.js";
-
+import mongoose from "mongoose";
 //Do Like
 export const doLike=asyncHandler(async function(req,res) {
     const userId=req.user?._id
@@ -37,7 +37,7 @@ export const doLike=asyncHandler(async function(req,res) {
               likedBy: userId
             }
         )
-        return message="Unlike Done"
+         message="Unlike Done"
     }
     else{
         const like=await Like.create(
@@ -47,7 +47,7 @@ export const doLike=asyncHandler(async function(req,res) {
               likedBy: userId
             }
         )
-        return message="like Done"
+         message="like Done"
     }
 
     return res
@@ -80,12 +80,17 @@ export const unLike=asyncHandler(async function(req,res) {
               likedBy: userId
             }
     )
+
+    if(!response){
+        throw new ApiError(404,"Like Refrence not found")
+    }
    
     return res
     .status(200)
     .json(
         new ApiResponse(
             "200",
+            response,
             "Unlike Done"
         )
     )
@@ -98,13 +103,12 @@ const findLike=asyncHandler(async function(req,res,targetType) {
     const {id: targetId}=req.params
     const userId=req.user?._id
 
-
     let Liked;
     if(userId){
         Liked=await Like.aggregate([
             {
               $match:{
-                targetId,
+                targetId:new mongoose.Types.ObjectId(targetId),
                 targetType,
               }   
             },
@@ -130,7 +134,7 @@ const findLike=asyncHandler(async function(req,res,targetType) {
         Liked=await Like.aggregate([
             {
               $match:{
-                targetId,
+                targetId:new mongoose.Types.ObjectId(targetId),
                 targetType,
               }   
             },
@@ -140,9 +144,10 @@ const findLike=asyncHandler(async function(req,res,targetType) {
         ])
 
     }
+
     
     const totalLikes=Liked[0]?.totalLikes || 0
-    const likedByUser=Liked[0]?.likedByuser || 0
+    const isliked=Liked[0]?.likedByuser || 0
 
     return res
     .status(200)
@@ -151,7 +156,7 @@ const findLike=asyncHandler(async function(req,res,targetType) {
             200,
             {
                totalLikes,
-               likedByUser
+               isliked
             },
             "fteched successfully"
 
@@ -161,14 +166,20 @@ const findLike=asyncHandler(async function(req,res,targetType) {
 
 })
 
+//Get Likes For Video
 export const getLikeForVideo=asyncHandler(async function(req,res) {
-    return findLike(req,res,"Video")
+    await findLike(req,res,"Video")
 })
 
+//Get Likes For Tweet
 export const getLikeForTweet=asyncHandler(async function(req,res) {
-    return findLike(req,res,"Tweet")
+    // return findLike(req,res,"Tweet")
+    //why not return because Findlike is alaso returnting to response
+    await findLike(req,res,"Tweet")
+
 })
 
+//Get Likes For Comment
 export const getLikeForComment=asyncHandler(async function(req,res) {
-    return findLike(req,res,"Comment")
+    await findLike(req,res,"Comment")
 })

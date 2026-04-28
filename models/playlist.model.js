@@ -11,7 +11,7 @@ const playListSchema=new Schema({
     },
     videos:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:"User"
+        ref:"Video"
     }
 },{timestamps:true})
 
