@@ -18,7 +18,7 @@ export const createTweet=asyncHandler(async function(req,res) {
 
     const response=await Tweet.create({
         content:content.trim(),
-        userId
+        tweetBy:userId
     })
 
     if(!response){
@@ -38,7 +38,10 @@ export const createTweet=asyncHandler(async function(req,res) {
 export const editTweet=asyncHandler(async function(req,res) {
     const userId=req.user?._id
     const {content}=req.body
-    const {id:tweetId}=req.params
+    const {id:tweetId}=req.params    
+
+    console.log(tweetId);
+    
 
     if(!userId){
         throw new ApiError(400,"user is not authenticated Do the edit")
@@ -49,6 +52,7 @@ export const editTweet=asyncHandler(async function(req,res) {
     }
 
     const tweet=await Tweet.findById(tweetId)
+    
 
     if(!tweet){
         throw new ApiError(400,"tweet Is not Found")
@@ -56,6 +60,10 @@ export const editTweet=asyncHandler(async function(req,res) {
 
     if(tweet.tweetBy.toString() !==userId.toString()){
         throw new ApiError(400,"You are not Authorized to edit this tweet")
+    }
+
+    if(tweet.content==content){
+        throw new ApiError(401,"For Edit Please send new edited Tweet not the same Content")
     }
 
     
@@ -124,16 +132,23 @@ export const fetchAllTweets=asyncHandler(async function(req,res) {
     const allTweets=await Tweet.find(query)
     .sort({ _id: -1 })
     .limit(10)
+    .lean()
 
     // if(!allTweets){
     //     throw new ApiError(400,"Some Issue arises during tweet fetch")
     // }
     //it will send [] if no tweets are there soo it will be never matched
 
+    console.log(allTweets);
+    
+
     const Editable=allTweets.map(tweet=>({
         ...tweet,
-        isEditable:userId && tweet.tweetBy.equals(userId)
+        isEditable:userId && tweet.tweetBy.toString()==userId
     }))
+
+    console.log(Editable);
+    
 
     const nextCursor=Editable.length>0?Editable[Editable.length-1]._id.toString():null
 
