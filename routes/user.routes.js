@@ -5,6 +5,8 @@ import { verifyJWT } from "../middlewares/jwt.middleware.js";
 import { allVideosDetails, deleteVideo, editVideo, videoUploader } from "../controllers/video.controller.js";
 import { doLike, getLikeForComment, getLikeForTweet, getLikeForVideo, unLike } from "../controllers/like.controller.js";
 import {optionalVerfiyJwt} from "../middlewares/optional.middleware.js"
+import {deleteComment, doComment, findCommentForTweet, findCommentForVideo, updateComment} from "../controllers/comment.controller.js"
+import {createTweet, deleteTweet, editTweet, fetchAllTweets} from "../controllers/tweet.controller.js"
 
 const router=Router()
 //Hello
@@ -131,7 +133,52 @@ const router=Router()
   )
 
 
-  //
+  //Comment Route
+  router.route("/user/comment").post(
+    verifyJWT,
+    doComment
+  )
+
+  router.route("/user/comment/update").post(
+    verifyJWT,
+    updateComment
+  )
+
+  router.route("/user/comment/deletecomment").delete(
+    verifyJWT,
+    deleteComment
+  )
+
+  router.route("/user/video/comment/:targetId").get(
+    optionalVerfiyJwt,
+    findCommentForVideo
+  )
+
+  router.route("/user/tweet/comment/:targetId").get(
+    optionalVerfiyJwt,
+    findCommentForTweet
+  )
+
+  //Tweets Routes
+  router.route("/user/tweet/create-tweet").post(
+    verifyJWT,
+    createTweet
+  )
+
+  router.route("/user/tweet/:id/edit-tweet").post(
+    verifyJWT,
+    editTweet
+  )
+
+  router.route("/user/tweet/delete/:tweetId").delete(
+    verifyJWT,
+    deleteTweet
+  )
+
+  router.route("/user/tweet/all-tweet").get(
+    optionalVerfiyJwt,
+    fetchAllTweets
+  )
  
 
 export default router;
