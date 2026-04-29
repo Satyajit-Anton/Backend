@@ -50,23 +50,34 @@ export const createPlayList=asyncHandler(async function(req,res) {
     )
 })
 
-export const findPlayList=asyncHandler(async function (req,res) {
+export const addnewItemtoPlayList=asyncHandler(async function(req,res){
     const userId=req.user?._id
+    const {playlistName,videoId}=req.body
 
     if(!userId){
-        throw new ApiError(400,"User is not Authorized to Give request")
+        throw new ApiError(400,"User is not Authenticated to Do that")
     }
 
-    const result=await PlayList.aggregate([
-        {
-            $match:{
-                owner:new mongoose.Types.ObjectId(userId)
-            }
-        }
-    ])
+    if(!playlistName || !videoId){
+        throw new ApiError(400,"VideoId and PlayListName Must need to add Video in the perticualr playlist")
+    }
 
-    if(result.length === 0){
-        throw new ApiError(400,"No Playlist Found or User is not found or unauthorized access")
+    const added=await PlayList.findOneAndUpdate(
+        {
+            name:playlistName,
+            owner:userId
+        },
+        {
+            $addToSet:{videos:videoId}
+        },
+        {
+            returnDocument:"after"
+        }
+
+    )
+
+    if(!added){
+        throw new ApiError(500,"Some issue when Adding to Playlist")
     }
 
     return res
@@ -74,15 +85,17 @@ export const findPlayList=asyncHandler(async function (req,res) {
     .json(
         new ApiResponse(
             200,
-            result,
-            "PLaylist fteched Sucessfully"
+            added,
+            "Video Added to Existing Playlist"
         )
     )
+
+
 })
 
 export const removeItemFromPlaylist=asyncHandler(async function(req,res) {
     const userId=req.user?._id
-    const { playlistId, videoId } = req.query;
+    const { playlistId, videoId } = req.body;
 
     if(!userId){
         throw new ApiError(400,"User is not authenticated")
@@ -102,7 +115,7 @@ export const removeItemFromPlaylist=asyncHandler(async function(req,res) {
         $pull:{videos:videoId}
        },
        {
-        new:true
+        returnDocument:"after"
        }
     )
 
@@ -152,6 +165,37 @@ export const removePlaylist=asyncHandler(async function(req,res) {
         new ApiResponse(
             200,
             "PlayList Delete Successfully"
+        )
+    )
+})
+
+
+export const findPlayList=asyncHandler(async function (req,res) {
+    const userId=req.user?._id
+
+    if(!userId){
+        throw new ApiError(400,"User is not Authorized to Give request")
+    }
+
+    const result=await PlayList.aggregate([
+        {
+            $match:{
+                owner:new mongoose.Types.ObjectId(userId)
+            }
+        }
+    ])
+
+    if(result.length === 0){
+        throw new ApiError(400,"No Playlist Found or User is not found or unauthorized access")
+    }
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(
+            200,
+            result,
+            "PLaylist fteched Sucessfully"
         )
     )
 })

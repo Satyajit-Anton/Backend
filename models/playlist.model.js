@@ -9,10 +9,12 @@ const playListSchema=new Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"
     },
-    videos:{
+    videos:[
+        {
         type:mongoose.Schema.Types.ObjectId,
         ref:"Video"
-    }
+       }
+    ]
 },{timestamps:true})
 
 export const PlayList=mongoose.model("PlayList",playListSchema)

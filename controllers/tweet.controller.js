@@ -122,7 +122,7 @@ export const deleteTweet=asyncHandler(async function(req,res) {
 export const fetchAllTweets=asyncHandler(async function(req,res) {
     const userId=req.user?._id
     const {cursor}=req.query
-
+    
     let query={}
 
     if(cursor){

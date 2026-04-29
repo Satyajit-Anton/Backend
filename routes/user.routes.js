@@ -7,9 +7,11 @@ import { doLike, getLikeForComment, getLikeForTweet, getLikeForVideo, unLike } f
 import {optionalVerfiyJwt} from "../middlewares/optional.middleware.js"
 import {deleteComment, doComment, findCommentForTweet, findCommentForVideo, updateComment} from "../controllers/comment.controller.js"
 import {createTweet, deleteTweet, editTweet, fetchAllTweets} from "../controllers/tweet.controller.js"
+import {addnewItemtoPlayList, createPlayList, findPlayList, removeItemFromPlaylist, removePlaylist} from "../controllers/playlist.controller.js"
+
 
 const router=Router()
-//Hello
+//User Controller
   router.route("/register").post(
     //injected middleware because files are two or more soo fields
     //it need array with all details of object
@@ -73,7 +75,8 @@ const router=Router()
     verifyJWT,
     getWatchHistory
   )
-
+  
+  //Video Route
   router.route("/user/videoupload").post(
     verifyJWT,
     upload.fields(
@@ -105,6 +108,39 @@ const router=Router()
     upload.single("thumbnail"),
     editVideo
   )
+
+  //PlayList Controller
+  router.route("/user/create-playlist").post(
+    verifyJWT,
+    createPlayList
+  )
+
+  router.route("/user/playlists").get(
+    verifyJWT,
+    findPlayList
+  )
+
+  router.route("/user/playlist/addvideo").post(
+    verifyJWT,
+    addnewItemtoPlayList
+  )
+
+  router.route("/user/playlist/removeitem").delete(
+    verifyJWT,
+    removeItemFromPlaylist
+  )
+
+  router.route("/user/playlist/removeplaylist/:playlistId").delete(
+    verifyJWT,
+    removePlaylist
+  )
+
+  router.route("/user/playlist/allplaylist").get(
+    verifyJWT,
+    findPlayList
+  )
+
+
  
   //Like Route
   router.route("/user/like").post(
@@ -179,6 +215,7 @@ const router=Router()
     optionalVerfiyJwt,
     fetchAllTweets
   )
- 
+
+
 
 export default router;
